@@ -1,0 +1,111 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: 'TRUE'
+    hibernate:
+      ddl-auto: update
+    open-in-view: 'false'
+  mvc:
+    hidden-method:
+      filter:
+        enabled: 'true'
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    password: ${db_password}
+    username: ${db_username}
+    url: jdbc:mysql://localhost:3306/simona_manikiur_spring_react?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+  thymeleaf: # Thymeleaf
+    cache: false
+    mode: HTML
+    encoding: UTF-8
+    prefix: file:src/main/resources/templates/
+
+  security:
+    user:
+      name: ""
+      password: ""
+
+  web:
+    resources:
+      static-locations: file:src/main/resources/static/
+      cache:
+        period: 0
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor: TRACE
+        SQL: DEBUG
+      nodeValue: WARN
+    blog: WARN
+  pattern:
+    level:
+server:
+  port: 8888
+
+  spring:
+    mail:
+      host: smtp.gmail.com
+      port: 587
+      username: ${email_username}
+      password: ${password_email}
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls.enable: true
+      test-connection: true
+-Djakarta:
+  mail:
+    util:
+      StreamProvider=org:
+        eclipse:
+          jakarta:
+            mail:
+              util:
+                MailStreamProvider:
+
+#  mail:
+#    com:
+#      sun:
+#        mail:jakarta:
+#          mail:
+#    host: smtp.gmail.com
+#    port: 578
+#    username: ${email_username}
+#    password: ${password_email}
+#    test-connection: true
+#     smtp.auth=true
+#     smtp.starttls.enable=true
+
+servlet:
+  multipart:
+    max-file-size: 10MB
+    max-request-size: 10MB
+    enabled: true
+  thymeleaf: # Thymeleaf
+    cache: false
+    mode: HTML
+    encoding: UTF-8
+    prefix: file:src/main/resources/templates/
+  web:
+    resources:
+      static-locations: file:src/main/resources/static/**
+      cache:
+        period: 0
+
+
+        server:
+          tomcat:
+            uri-encoding=UTF-8:
+google:
+  recaptcha:
+    secret: ${secret_key_recaptcha}
+    site: ${site_key_recaptcha}
+#      recaptcha:
+#      secret: ${secret_key}
+#      site: ${site_key}
+
