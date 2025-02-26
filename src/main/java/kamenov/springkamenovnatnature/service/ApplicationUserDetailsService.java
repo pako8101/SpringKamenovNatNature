@@ -1,9 +1,10 @@
-package HistoryAppGradleSecurity.service;
+package kamenov.springkamenovnatnature.service;
 
-import HistoryAppGradleSecurity.model.AppUserDetails;
-import HistoryAppGradleSecurity.model.entity.UserEnt;
-import HistoryAppGradleSecurity.model.entity.UserRoleEnt;
-import HistoryAppGradleSecurity.repository.UserRepository;
+
+import kamenov.springkamenovnatnature.entity.UserEntity;
+import kamenov.springkamenovnatnature.entity.UserRoleEnt;
+import kamenov.springkamenovnatnature.repositories.UserRepository;
+import kamenov.springkamenovnatnature.user.AppUserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,24 +25,24 @@ public class ApplicationUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return
                 userRepository.
-                        findUserEntByUsername(username).
+                        findByUsername(username).
                         map(ApplicationUserDetailsService::map).
                         orElseThrow(() -> new UsernameNotFoundException("User with name " + username + " not found!"));
     }
 
-    private static   UserDetails map(UserEnt userEntity) {
+    private static   UserDetails map(UserEntity userEntity) {
 
         return new AppUserDetails(
                 userEntity.getUsername(),
                 userEntity.getPassword(),
                 extractAuthorities(userEntity)
-        ).setAge(userEntity.getAge()).
+        ).
                 setFullName(userEntity.getFullName());
 
     }
 
 
-    private static List<GrantedAuthority> extractAuthorities(UserEnt userEntity) {
+    private static List<GrantedAuthority> extractAuthorities(UserEntity userEntity) {
         return userEntity.
                 getRoles().
                 stream().

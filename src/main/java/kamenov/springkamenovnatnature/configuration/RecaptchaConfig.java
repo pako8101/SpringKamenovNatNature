@@ -1,2 +1,4 @@
-package kamenov.springkamenovnatnature.configuration;public class RecaptchaConfig {
+package kamenov.springkamenovnatnature.configuration;
+
+public class RecaptchaConfig {
 }

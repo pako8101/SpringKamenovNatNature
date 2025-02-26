@@ -1,8 +1,9 @@
-package HistoryAppGradleSecurity.session;
+package kamenov.springkamenovnatnature.user;
 
-import HistoryAppGradleSecurity.model.entity.UserEnt;
-import HistoryAppGradleSecurity.model.enums.UserRoleEnum;
-import HistoryAppGradleSecurity.repository.UserRepository;
+
+import kamenov.springkamenovnatnature.entity.UserEntity;
+import kamenov.springkamenovnatnature.entity.enums.UserRoleEnum;
+import kamenov.springkamenovnatnature.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,9 +29,7 @@ public class LoggedUser {
         return hasRole(UserRoleEnum.ADMIN);
     }
 
-    public boolean isModerator() {
-        return hasRole(UserRoleEnum.MODERATOR);
-    }
+
 
     public boolean isOnlyUser() {
         return getAuthentication().getAuthorities().stream()
@@ -53,9 +52,9 @@ public class LoggedUser {
     private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
-    public UserEnt get(){
+    public UserEntity get(){
         String username = getUsername();
-       return userRepository.findUserEntByUsername(username)
+       return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " was not found!"));
 
     }

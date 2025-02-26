@@ -1,4 +1,4 @@
-package HistoryAppGradleSecurity.config;
+package kamenov.springkamenovnatnature.configuration;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
