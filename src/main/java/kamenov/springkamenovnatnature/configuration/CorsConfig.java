@@ -12,9 +12,11 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/auth")
+                registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3001")  // Сложи тук фронтенд домейна и порта
-                        .allowedMethods("GET", "POST", "PUT", "DELETE");
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+             .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }

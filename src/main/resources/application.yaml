@@ -15,7 +15,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     password: ${db_password}
     username: ${db_username}
-    url: jdbc:mysql://localhost:3306/simona_manikiur_spring_react?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/natural_nature_react_kamenov_app?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
   thymeleaf: # Thymeleaf
     cache: false
     mode: HTML
@@ -103,8 +103,8 @@ servlet:
             uri-encoding=UTF-8:
 google:
   recaptcha:
-    secret: ${secret_key_recaptcha}
-    site: ${site_key_recaptcha}
+     secret: ${secret_key_recaptcha}
+     site: ${site_key_recaptcha}
 #      recaptcha:
 #      secret: ${secret_key}
 #      site: ${site_key}

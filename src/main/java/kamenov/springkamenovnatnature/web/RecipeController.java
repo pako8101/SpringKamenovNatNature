@@ -11,9 +11,9 @@ import java.util.List;
 @RequestMapping("/api/recipes")
 @CrossOrigin(origins = "http://localhost:3001")
 public class RecipeController {
-    @Autowired
-    private final RecipeService service;
 
+    private final RecipeService service;
+    @Autowired
     public RecipeController(RecipeService service) {
         this.service = service;
     }

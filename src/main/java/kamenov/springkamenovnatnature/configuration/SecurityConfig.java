@@ -48,11 +48,17 @@ public class SecurityConfig {
                                         requestMatchers("/",
                                                 "/about",
                                                 "/api/auth/**",
+                                                "api/blog/posts",
+                                                "api/blog/comments",
+                                                "api/blog/likes",
+                                                "api/cart/**",
                                                 "/wine",
                                                 "/delete/**",
+                                                "/api/auth/login",
+                                                "/api/auth/register",
                                                 "/edit/**",
-                                                "/users/login-error",
-                                                "/users/login", "/users/register"
+                                                "/users/login-error"
+
 
                                         )
                                         .permitAll()

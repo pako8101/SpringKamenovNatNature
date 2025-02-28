@@ -9,8 +9,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface UserService {
-    UserEntity registerUser(RegisterDto userRegisterDto,
-                            Consumer<Authentication> successfulRegister);
+//    UserEntity registerUser(RegisterDto userRegisterDto,
+//                            Consumer<Authentication> successfulRegister);
+
+
+
+    UserEntity registerUser(UserEntity user);
 
     UserEntity findByName(String username);
 

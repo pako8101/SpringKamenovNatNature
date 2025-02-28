@@ -53,91 +53,92 @@ private final RecaptchaService recaptchaService;
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/register")
-    public String registerForm(Model model) {
-        if (!model.containsAttribute("userRegisterDto")) {
-            model.addAttribute("userRegisterDto", new RegisterDto());
-        }
-        //  model.addAttribute("recaptchaSiteKey", recaptchaSiteKey);
-        return "register";
-    }
-//    @PostMapping("/register")
-//    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDto request) {
-//        // Валидиране на reCAPTCHA
-//        boolean recaptchaValid = recaptchaService.validateRecaptcha(request.recaptchaToken);
-//        if (!recaptchaValid) {
-//            return ResponseEntity.badRequest().body("Invalid reCAPTCHA");
+//    @GetMapping("/register")
+//    public String registerForm(Model model) {
+//        if (!model.containsAttribute("userRegisterDto")) {
+//            model.addAttribute("userRegisterDto", new RegisterDto());
 //        }
-//        // Проверка дали потребителят съществува (може да се добави и проверка за email)
-//        if (userService.findByName(request.getUsername()) != null) {
-//            return ResponseEntity.badRequest().body("Username already exists");
-//        }
-//        if (userService.findByEmail(request.getEmail()) != null) {
-//            return ResponseEntity.badRequest().body("Username already exists");
-//        }
-//        UserEntity newUser = new UserEntity(request.getUsername(),
-//                request.getFullName(), request.getEmail(),
-//                request.getPassword(),
-//                request.getPassword());
-//     RegisterDto registerDto = new RegisterDto(modelMapper.map(newUser, RegisterDto.class));
-//        userService.registerUser(registerDto);
-//
-//        return ResponseEntity.ok("User registered successfully");
+//        //  model.addAttribute("recaptchaSiteKey", recaptchaSiteKey);
+//        return "register";
 //    }
-
     @PostMapping("/register")
-    public ResponseEntity<?> registerPost(@Valid @RequestBody RegisterDto userRegisterDto,
-                               HttpServletRequest request,
-                               HttpServletResponse response,
-                               Model model,
-                               BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes) {
-        if (userService.findByName(userRegisterDto.getUsername()) != null) {
-            return ResponseEntity.badRequest().body("Username already exists");
-        }
-        if (userService.findByEmail(userRegisterDto.getEmail()) != null) {
-            return ResponseEntity.badRequest().body("Username already exists");
-        }
-
-        if (bindingResult.hasErrors() || !userRegisterDto.getPassword()
-                .equals(userRegisterDto.getConfirmPassword())) {
-
-            redirectAttributes.addFlashAttribute("registerDto",
-                    userRegisterDto);
-            redirectAttributes.addFlashAttribute(
-                    "org.springframework.validation.BindingResult." +
-                            "registerDto", bindingResult);
-
-            return ResponseEntity.badRequest().body("Wrong password mismatch");
-        }
-//        if (!recaptchaService.validateRecaptcha(request.getRecaptchaToken())) {
-//            return ResponseEntity.badRequest().body("Невалидна reCAPTCHA!");
-//        }
-        boolean recaptchaValid = recaptchaService.validateRecaptcha(userRegisterDto.recaptchaToken);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDto request) {
+        // Валидиране на reCAPTCHA
+        boolean recaptchaValid = recaptchaService.validateRecaptcha(request.recaptchaToken);
         if (!recaptchaValid) {
             return ResponseEntity.badRequest().body("Invalid reCAPTCHA");
         }
-        UserEntity user =
-                userService.registerUser(userRegisterDto, successfulAuth -> {
-                    SecurityContextHolderStrategy strategy = SecurityContextHolder.getContextHolderStrategy();
+        // Проверка дали потребителят съществува (може да се добави и проверка за email)
+        if (userService.findByName(request.getUsername()) != null) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
+        if (userService.findByEmail(request.getEmail()) != null) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
+        UserEntity newUser = new UserEntity(request.getUsername(),
+                request.getFullName(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getConfirmPassword());
 
-                    SecurityContext context = strategy.createEmptyContext();
-                    context.setAuthentication(successfulAuth);
-
-                    strategy.setContext(context);
-                    securityContextRepository.saveContext(context, request, response);
-
-                });
-        Cookie cookie = new Cookie("jwt", jwtService.generateToken(user));
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
-
-        model.addAttribute("message", "Registration successful");
+        userService.registerUser(newUser);
 
         return ResponseEntity.ok("User registered successfully");
     }
+
+//    @PostMapping("/register")
+//    public ResponseEntity<?> registerPost(@Valid @RequestBody RegisterDto userRegisterDto,
+//                               HttpServletRequest request,
+//                               HttpServletResponse response,
+//                               Model model,
+//                               BindingResult bindingResult,
+//                               RedirectAttributes redirectAttributes) {
+//        if (userService.findByName(userRegisterDto.getUsername()) != null) {
+//            return ResponseEntity.badRequest().body("Username already exists");
+//        }
+//        if (userService.findByEmail(userRegisterDto.getEmail()) != null) {
+//            return ResponseEntity.badRequest().body("Username already exists");
+//        }
+//
+//        if (bindingResult.hasErrors() || !userRegisterDto.getPassword()
+//                .equals(userRegisterDto.getConfirmPassword())) {
+//
+//            redirectAttributes.addFlashAttribute("registerDto",
+//                    userRegisterDto);
+//            redirectAttributes.addFlashAttribute(
+//                    "org.springframework.validation.BindingResult." +
+//                            "registerDto", bindingResult);
+//
+//            return ResponseEntity.badRequest().body("Wrong password mismatch");
+//        }
+////        if (!recaptchaService.validateRecaptcha(request.getRecaptchaToken())) {
+////            return ResponseEntity.badRequest().body("Невалидна reCAPTCHA!");
+////        }
+//        boolean recaptchaValid = recaptchaService.validateRecaptcha(userRegisterDto.recaptchaToken);
+//        if (!recaptchaValid) {
+//            return ResponseEntity.badRequest().body("Invalid reCAPTCHA");
+//        }
+//        UserEntity user =
+//                userService.registerUser(userRegisterDto, successfulAuth -> {
+//                    SecurityContextHolderStrategy strategy = SecurityContextHolder.getContextHolderStrategy();
+//
+//                    SecurityContext context = strategy.createEmptyContext();
+//                    context.setAuthentication(successfulAuth);
+//
+//                    strategy.setContext(context);
+//                    securityContextRepository.saveContext(context, request, response);
+//
+//                });
+//        Cookie cookie = new Cookie("jwt", jwtService.generateToken(user));
+//        cookie.setPath("/");
+//        cookie.setMaxAge(60 * 60 * 24);
+//        cookie.setHttpOnly(true);
+//        response.addCookie(cookie);
+//
+//        model.addAttribute("message", "Registration successful");
+//
+//        return ResponseEntity.ok("User registered successfully");
+//    }
 
     @ModelAttribute
     public LoginDto loginDto() {
