@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Locale;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/auth/api")
 @CrossOrigin(origins = "http://localhost:3001")
 public class LanguageController {
 
@@ -18,4 +18,12 @@ public class LanguageController {
     public String getWelcomeMessage(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
         return messageSource.getMessage("welcome", null, locale);
     }
+//    @CrossOrigin(origins = "http://localhost:3001")
+//    @GetMapping("/api/welcome")
+//    public String welcome(@RequestHeader("Accept-Language") String language) {
+//        if ("bg".equals(language)) {
+//            return "Добре дошъл!";
+//        }
+//        return "Welcome!";
+//    }
 }

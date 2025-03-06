@@ -19,11 +19,6 @@ public class UserEntity {
     @Column(nullable = false,unique = true)
     private String email;
 
-
-
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Article> articles;
-
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)

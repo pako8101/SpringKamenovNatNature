@@ -13,8 +13,10 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3001")  // Сложи тук фронтенд домейна и порта
+                        .allowedOrigins("http://localhost:3001")
+                        // Сложи тук фронтенд домейна и порта
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedHeaders("Accept-Language")
              .allowedHeaders("*")
                         .allowCredentials(true);
             }

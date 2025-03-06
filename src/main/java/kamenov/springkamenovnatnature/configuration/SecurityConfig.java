@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,7 +40,7 @@ public class SecurityConfig {
                                            SecurityContextRepository securityContextRepository
             , JwtAuthFilter jwtAuthFilter   ) throws Exception {
 
-        http
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authorizeHttpRequests ->
                                 authorizeHttpRequests.
@@ -51,6 +52,7 @@ public class SecurityConfig {
                                                 "api/blog/posts",
                                                 "api/blog/comments",
                                                 "api/blog/likes",
+                                                "api/marketplace/products",
                                                 "api/cart/**",
                                                 "/wine",
                                                 "/delete/**",
@@ -74,13 +76,13 @@ public class SecurityConfig {
                 .formLogin(
                         (formLogin) ->
                                 formLogin.
-                                        loginPage("/users/login").
+                                        loginPage("/api/auth/login").
                                         usernameParameter(
                                                 UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY).
                                         passwordParameter(
                                                 UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY).
                                         defaultSuccessUrl("/", true).
-                                        failureForwardUrl("/users/login-error")
+                                        failureForwardUrl("/api/auth/login-error")
 
                 )
                 .logout((logout) ->

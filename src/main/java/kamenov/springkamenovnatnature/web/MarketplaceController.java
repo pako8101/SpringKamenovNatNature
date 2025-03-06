@@ -11,9 +11,9 @@ import java.util.List;
 @RequestMapping("/api/marketplace")
 @CrossOrigin(origins = "http://localhost:3001")
 public class MarketplaceController {
-    @Autowired
-    private final MarketplaceService service;
 
+    private final MarketplaceService service;
+    @Autowired
     public MarketplaceController(MarketplaceService service) {
         this.service = service;
     }

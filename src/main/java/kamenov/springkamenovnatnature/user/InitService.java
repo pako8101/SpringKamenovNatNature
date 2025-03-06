@@ -7,6 +7,7 @@ import kamenov.springkamenovnatnature.entity.UserRoleEnt;
 import kamenov.springkamenovnatnature.entity.enums.UserRoleEnum;
 import kamenov.springkamenovnatnature.repositories.UserRepository;
 import kamenov.springkamenovnatnature.repositories.UserRoleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class InitService {
     private final PasswordEncoder passwordEncoder;
     private final String defaultPassword;
 
-
+@Autowired
     public InitService(UserRoleRepository userRoleRepository,
                        UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
