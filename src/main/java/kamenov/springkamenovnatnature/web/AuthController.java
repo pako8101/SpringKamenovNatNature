@@ -21,7 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,16 +41,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3001")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final UserRepository userRepository;
     private final SecurityContextRepository securityContextRepository;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-private final RecaptchaService recaptchaService;
+    private final RecaptchaService recaptchaService;
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
+
     @Autowired
     public AuthController(AuthenticationManager authenticationManager, UserService userService, UserRepository userRepository, SecurityContextRepository securityContextRepository, RecaptchaService recaptchaService, ModelMapper modelMapper, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
@@ -86,18 +89,32 @@ private final RecaptchaService recaptchaService;
 //        return ResponseEntity.ok("User registered successfully");
 //    }
 
-
-
-@GetMapping("/me")
-public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
-    if (userDetails == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+        Map<String, String> response = new HashMap<>();
+        response.put("username", userDetails.getUsername());
+        // Добавяне на ролята от authorities
+        String role = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("USER"); // По подразбиране "USER", ако няма роли
+        response.put("role", role.replace("ROLE_", "")); // Премахва "ROLE_" префикса, ако има
+        return ResponseEntity.ok(response);
     }
 
-    Map<String, String> response = new HashMap<>();
-    response.put("username", userDetails.getUsername());
-    return ResponseEntity.ok(response);
-}
+//@GetMapping("/me")
+//public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+//    if (userDetails == null) {
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+//    }
+
+//    Map<String, String> response = new HashMap<>();
+//    response.put("username", userDetails.getUsername());
+//    return ResponseEntity.ok(response);
+//}
     @PostMapping("/register")
     public ResponseEntity<?> registerPost(@Valid @RequestBody RegisterDto userRegisterDto,
                                HttpServletRequest request,
@@ -123,9 +140,7 @@ public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails use
 
             return ResponseEntity.badRequest().body("Wrong password mismatch");
         }
-//        if (!recaptchaService.validateRecaptcha(request.getRecaptchaToken())) {
-//            return ResponseEntity.badRequest().body("Невалидна reCAPTCHA!");
-//        }
+
         boolean recaptchaValid = recaptchaService.validateRecaptcha(userRegisterDto.recaptchaToken);
         if (!recaptchaValid) {
             return ResponseEntity.badRequest().body("Invalid reCAPTCHA");
@@ -146,10 +161,15 @@ public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails use
         cookie.setMaxAge(60 * 60 * 24);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
-
-        model.addAttribute("message", "Registration successful");
-
-        return ResponseEntity.ok("User registered successfully");
+        String token = jwtService.generateToken(user);
+        // Връщане на токена в JSON
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("token", token);
+        responseBody.put("username", user.getUsername());
+        return ResponseEntity.ok(responseBody);
+//        model.addAttribute("message", "Registration successful");
+//
+//        return ResponseEntity.ok("User registered successfully");
     }
 
     @ModelAttribute
@@ -157,20 +177,41 @@ public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails use
         return new LoginDto();
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginDto request) {
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(),
-                            request.getPassword())
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
+            UserDetails userDetails = (UserDetails) auth.getPrincipal();
+            String token = jwtService.generateToken(request.getUsername());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("username", request.getUsername().toString());
+            String role = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .findFirst()
+                    .orElse("USER");
+            response.put("role", role.replace("ROLE_", ""));
+            return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Incorrect username or password");
         }
-        String token = jwtService.generateToken(request.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token, request.getUsername()));
     }
+
+//    @PostMapping("/login")
+//    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginDto request) {
+//        try {
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(request.getUsername(),
+//                            request.getPassword())
+//            );
+//        } catch (AuthenticationException e) {
+//            return ResponseEntity.status(401).body("Incorrect username or password");
+//        }
+//        String token = jwtService.generateToken(request.getUsername());
+//        return ResponseEntity.ok(new AuthResponse(token, request.getUsername()));
+//    }
 
     @PostMapping("/login-error")
     public String onFailedLogin(@ModelAttribute(UsernamePasswordAuthenticationFilter

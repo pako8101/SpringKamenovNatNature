@@ -43,7 +43,7 @@ public class JwtServiceImpl implements JwtService {
     }
     @Override
     public String generateToken(UserEntity user) {
-        return "Bearer-" + generateTokenValue(new HashMap<>(), user.getUsername());
+        return "Bearer" + generateTokenValue(new HashMap<>(), user.getUsername());
     }
 //    @SuppressWarnings("unchecked")
     @SuppressWarnings("unchecked")
